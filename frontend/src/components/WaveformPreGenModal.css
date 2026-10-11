@@ -1,0 +1,191 @@
+/* WaveformPreGenModal.css */
+.wpgm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .wpgm-overlay {
+  background: rgba(0,0,0,0.15);
+}
+
+.wpgm-panel {
+  background: var(--mac-panel-bg);
+  backdrop-filter: blur(var(--glass-blur, 40px));
+  border: 1px solid var(--mac-border);
+  border-radius: var(--mac-radius-lg, 16px);
+  padding: 40px 48px;
+  max-width: 480px;
+  width: calc(100% - 32px);
+  text-align: center;
+  box-shadow: var(--mac-shadow);
+}
+
+.wpgm-icon {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.wpgm-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--mac-text);
+  margin: 0 0 6px;
+}
+
+.wpgm-desc {
+  font-size: 13px;
+  color: var(--mac-text-secondary);
+  margin: 0 0 8px;
+}
+
+.wpgm-progress-wrap {
+  background: rgba(128,128,128,0.08);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 16px 0 12px;
+  text-align: left;
+}
+
+.wpgm-progress-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--mac-text-secondary);
+  margin-bottom: 8px;
+}
+
+.wpgm-progress-count {
+  font-family: 'SF Mono', 'Cascadia Code', monospace;
+  color: var(--mac-text);
+}
+
+.wpgm-progress-track {
+  background: rgba(128,128,128,0.12);
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.wpgm-progress-fill {
+  background: linear-gradient(90deg, #0A84FF, #5E5CE6);
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.3s ease;
+}
+
+.wpgm-progress-speed {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--mac-text-secondary);
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.wpgm-current-file {
+  font-size: 11px;
+  color: var(--mac-text-secondary);
+  opacity: 0.5;
+  font-family: 'SF Mono', 'Cascadia Code', monospace;
+  text-align: center;
+  margin: 0;
+}
+
+.wpgm-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.wpgm-btn-primary {
+  background: var(--mac-accent, #0A84FF);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.wpgm-btn-primary:hover { background: #409CFF; }
+
+.wpgm-btn-secondary {
+  background: var(--mac-modal-btn-bg, rgba(255,255,255,0.06));
+  color: var(--mac-text);
+  border: 1px solid var(--mac-modal-btn-border, rgba(255,255,255,0.1));
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.wpgm-btn-secondary:hover { background: var(--mac-modal-btn-hover, rgba(255,255,255,0.12)); }
+
+[data-theme="light"] .wpgm-btn-secondary {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .wpgm-btn-secondary:hover {
+  background: rgba(0,0,0,0.08);
+}
+
+.wpgm-spinner {
+  width: 28px; height: 28px;
+  border: 2.5px solid rgba(128,128,128,0.15);
+  border-top-color: var(--mac-accent, #0A84FF);
+  border-radius: 50%;
+  animation: wpgm-spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes wpgm-spin { to { transform: rotate(360deg); } }
+
+/* Mini dock */
+.wpgm-mini-dock {
+  background: var(--mac-surface-solid, #1c1c1e);
+  border: 1px solid var(--mac-border);
+  border-radius: var(--mac-radius-md, 10px);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  min-width: 320px;
+  box-shadow: var(--mac-shadow);
+}
+.wpgm-mini-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(128,128,128,0.2);
+  border-top-color: var(--mac-accent, #0A84FF);
+  border-radius: 50%;
+  animation: wpgm-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.wpgm-mini-info { flex: 1; }
+.wpgm-mini-label {
+  display: flex; justify-content: space-between; font-size: 11px;
+  margin-bottom: 4px; color: var(--mac-text-secondary);
+}
+.wpgm-mini-track {
+  background: rgba(128,128,128,0.12); border-radius: 100px;
+  height: 4px; overflow: hidden;
+}
+.wpgm-mini-fill {
+  background: var(--mac-accent, #0A84FF); height: 100%;
+  border-radius: 100px; transition: width 0.3s ease;
+}

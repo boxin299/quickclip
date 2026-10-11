@@ -1,0 +1,284 @@
+.clip-import-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.clip-import-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0;
+}
+
+.clip-import-inner .mac-settings-section {
+    margin-bottom: 0;
+}
+
+/* ── 状态横幅 ── */
+
+.clip-import-status-banner {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.clip-import-status-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+}
+
+.clip-import-status-indicator {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.clip-import-indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.clip-import-indicator-dot.is-running {
+    background: #34C759;
+    box-shadow: 0 0 8px rgba(52, 199, 89, 0.5);
+}
+
+.clip-import-indicator-dot.is-stopped {
+    background: #8E8E93;
+}
+
+.clip-import-indicator-dot.is-starting {
+    background: #FF9F0A;
+    box-shadow: 0 0 8px rgba(255, 159, 10, 0.5);
+}
+
+.clip-import-indicator-dot.is-error {
+    background: #FF3B30;
+    box-shadow: 0 0 8px rgba(255, 59, 48, 0.45);
+}
+
+.clip-import-status-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.clip-import-status-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.clip-import-status-subtext {
+    color: var(--mac-text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* 暂停按钮 — 红色边框 outline 风格 */
+.clip-import-btn-danger-outline {
+    color: #FF453A;
+    border-color: rgba(255, 69, 58, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.clip-import-btn-danger-outline:hover {
+    background: rgba(255, 69, 58, 0.08);
+}
+
+/* ── 导入历史 ── */
+
+.clip-import-history-section {
+    /* spacing handled by clip-import-inner gap */
+}
+
+.clip-import-history-panel {
+    padding: 0;
+    overflow: hidden;
+}
+
+.clip-import-history-section .glass-panel {
+    margin-bottom: 0;
+}
+
+.clip-import-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-left: 12px;
+}
+
+.clip-import-history-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mac-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clip-import-history-badge {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mac-text-secondary);
+    line-height: 1.4;
+}
+
+.clip-import-clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--mac-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.clip-import-clear-btn:hover {
+    background: rgba(10, 132, 255, 0.08);
+}
+
+/* 列表 */
+.clip-import-history-list {
+    border-top: 1px solid var(--mac-border);
+}
+
+.clip-import-history-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--mac-border);
+    transition: background 0.5s;
+}
+
+.clip-import-history-row:last-child {
+    border-bottom: none;
+}
+
+.clip-import-history-row.is-new {
+    background: rgba(10, 132, 255, 0.06);
+}
+
+.clip-import-history-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.clip-import-history-icon.is-success {
+    color: #34C759;
+    background: rgba(52, 199, 89, 0.15);
+}
+
+.clip-import-history-icon.is-skipped {
+    color: #FF9F0A;
+    background: rgba(255, 159, 10, 0.15);
+}
+
+.clip-import-history-icon.is-error {
+    color: #FF3B30;
+    background: rgba(255, 59, 48, 0.15);
+}
+
+.clip-import-history-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mac-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.clip-import-history-row.is-new .clip-import-history-name {
+    color: #0A84FF;
+    font-weight: 600;
+}
+
+.clip-import-history-size {
+    font-size: 11px;
+    color: #6a6a6a;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
+.clip-import-history-status {
+    font-size: 11px;
+    flex-shrink: 0;
+    min-width: 48px;
+    text-align: right;
+}
+
+.clip-import-history-status.is-success { color: #34C759; }
+.clip-import-history-status.is-skipped { color: #FF9F0A; }
+.clip-import-history-status.is-error   { color: #FF3B30; }
+
+/* 空状态 */
+.clip-import-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    padding: 48px 24px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.clip-import-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--mac-input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: var(--mac-text-secondary);
+}
+
+.clip-import-empty-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #aaa;
+    margin-bottom: 4px;
+}
+
+.clip-import-empty-desc {
+    font-size: 12px;
+    color: #6a6a6a;
+    line-height: 1.5;
+}

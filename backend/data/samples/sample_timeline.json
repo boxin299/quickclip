@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "video_path": "/tmp/demo.mp4",
+  "frame_rate": 24,
+  "total_clips": 3,
+  "total_duration_frames": 408,
+  "total_duration_seconds": 17.0,
+  "total_duration_timecode": "00:00:17:00",
+  "clips": [
+    {
+      "clip_id": 0,
+      "source_file": "/tmp/demo.mp4",
+      "source_start_frame": 0,
+      "source_end_frame": 100,
+      "source_start_timecode": "00:00:00:00",
+      "source_end_timecode": "00:00:04:04",
+      "timeline_start_frame": 0,
+      "timeline_end_frame": 100,
+      "timeline_start_timecode": "00:00:00:00",
+      "timeline_end_timecode": "00:00:04:04",
+      "duration_frames": 100,
+      "duration_seconds": 4.167,
+      "text": "大家好，欢迎来到文本驱动剪辑演示。",
+      "bold": false,
+      "original_segment_id": 0
+    },
+    {
+      "clip_id": 1,
+      "source_file": "/tmp/demo.mp4",
+      "source_start_frame": 100,
+      "source_end_frame": 206,
+      "source_start_timecode": "00:00:04:04",
+      "source_end_timecode": "00:00:08:14",
+      "timeline_start_frame": 100,
+      "timeline_end_frame": 206,
+      "timeline_start_timecode": "00:00:04:04",
+      "timeline_end_timecode": "00:00:08:14",
+      "duration_frames": 106,
+      "duration_seconds": 4.417,
+      "text": "这一段会被保留到时间线中。",
+      "bold": true,
+      "original_segment_id": 1
+    },
+    {
+      "clip_id": 2,
+      "source_file": "/tmp/demo.mp4",
+      "source_start_frame": 290,
+      "source_end_frame": 441,
+      "source_start_timecode": "00:00:12:02",
+      "source_end_timecode": "00:00:18:09",
+      "timeline_start_frame": 206,
+      "timeline_end_frame": 357,
+      "timeline_start_timecode": "00:00:08:14",
+      "timeline_end_timecode": "00:00:14:21",
+      "duration_frames": 151,
+      "duration_seconds": 6.292,
+      "text": "最后一段用于展示时间线拼接效果。",
+      "bold": false,
+      "original_segment_id": 3
+    }
+  ],
+  "deleted_segments": [
+    {
+      "id": 2,
+      "text": "这一段稍后会被删除。",
+      "start": 8.6,
+      "end": 12.1
+    }
+  ]
+}

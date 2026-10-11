@@ -1,0 +1,40 @@
+{
+  "video_path": "/tmp/demo.mp4",
+  "duration": 18.4,
+  "language": "zh",
+  "language_probability": 0.98,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0.0,
+      "end": 4.2,
+      "text": "大家好，欢迎来到文本驱动剪辑演示。",
+      "deleted": false,
+      "bold": false
+    },
+    {
+      "id": 1,
+      "start": 4.2,
+      "end": 8.6,
+      "text": "这一段会被保留到时间线中。",
+      "deleted": false,
+      "bold": true
+    },
+    {
+      "id": 2,
+      "start": 8.6,
+      "end": 12.1,
+      "text": "这一段稍后会被删除。",
+      "deleted": true,
+      "bold": false
+    },
+    {
+      "id": 3,
+      "start": 12.1,
+      "end": 18.4,
+      "text": "最后一段用于展示时间线拼接效果。",
+      "deleted": false,
+      "bold": false
+    }
+  ]
+}

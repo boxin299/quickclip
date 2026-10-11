@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="description" content="QuickClip - DaVinci Resolve 文本驱动剪辑工具" />
+    <title>QuickClip</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+    <link rel="stylesheet" href="/fonts/misans.css" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: 'Geist', 'MiSans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+  document.addEventListener('contextmenu', e => {
+    const tag = e.target.tagName;
+    const editable = e.target.isContentEditable;
+    // 允许可编辑元素和输入框的原生右键菜单（复制/粘贴/全选等）
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || editable) return;
+    // 允许选中文本时右键复制
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim()) return;
+    e.preventDefault();
+  });
+</script>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+# Local credentials and user data
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+*.log
+*.sqlite*
+backend/data/*
+!backend/data/samples/
+!backend/data/samples/**
+.quickclip/
+.wrangler/
+# Regenerable dependencies, caches and build outputs
+node_modules/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.cache/
+.modelscope/
+.rustup/
+.cargo/
+Library/
+target/
+dist/
+build/
+frontend/src-tauri/backend-runtime/
+frontend/src-tauri/python-standalone*.tar.gz
+.worktrees/
+# Local assistant state and macOS metadata
+.claude/
+.agent/
+.agents/
+.codebuddy/
+.workbuddy/
+.trae/
+.superpowers/
+.DS_Store
+._*
+
+# Website excluded from this desktop-source import
+web/

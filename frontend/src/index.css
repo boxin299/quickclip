@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL STYLES — 跟随系统浅色/深色模式
+   浅色: 白底蓝调  |  深色: 黑底蓝白
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Geist Font (Local) ───────────────────────────────── */
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist/Geist-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist/Geist-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist/Geist-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist/Geist-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist/Geist-Black.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ── CSS 变量：浅色默认 / 深色覆盖 ────────────────────── */
+
+:root {
+    /* 浅色默认 */
+    --bg-root: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f1f5f9;
+    --bg-input: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border-default: rgba(0, 0, 0, 0.08);
+    --border-focus: #2563eb;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-text: #ffffff;
+    --error-bg: rgba(239, 68, 68, 0.06);
+    --error-text: #dc2626;
+    --error-border: rgba(239, 68, 68, 0.18);
+    --card-shadow: 0 1px 0 rgba(0,0,0,0.04) inset, 0 8px 32px rgba(0,0,0,0.08);
+    --link-color: #64748b;
+    --link-hover: #0f172a;
+    --divider-color: rgba(0, 0, 0, 0.08);
+    --input-border: rgba(0, 0, 0, 0.12);
+    --input-focus-ring: rgba(37, 99, 235, 0.1);
+    --brand-icon-bg: rgba(37, 99, 235, 0.08);
+    --brand-icon-fg: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-root: #09090b;
+        --bg-surface: #18181b;
+        --bg-elevated: #27272a;
+        --bg-input: rgba(255, 255, 255, 0.05);
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --text-muted: #52525b;
+        --border-default: rgba(255, 255, 255, 0.08);
+        --border-focus: #3b82f6;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --accent-text: #ffffff;
+        --error-bg: rgba(239, 68, 68, 0.1);
+        --error-text: #fca5a5;
+        --error-border: rgba(239, 68, 68, 0.2);
+        --card-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 16px 48px rgba(0,0,0,0.5);
+        --link-color: #a1a1aa;
+        --link-hover: #f4f4f5;
+        --divider-color: rgba(255, 255, 255, 0.08);
+        --input-border: rgba(255, 255, 255, 0.1);
+        --input-focus-ring: rgba(59, 130, 246, 0.12);
+        --brand-icon-bg: rgba(59, 130, 246, 0.12);
+        --brand-icon-fg: #3b82f6;
+    }
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+html {
+    box-sizing: border-box;
+    background: transparent;
+}
+
+body {
+    margin: 0;
+    font-family: 'Geist', 'MiSans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-root);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+::selection {
+    background: rgba(37, 99, 235, 0.3);
+    color: var(--text-primary);
+}
