@@ -1,0 +1,11 @@
+{
+  "version": "1.0.1",
+  "release_date": "2026-05-17",
+  "changelog": "首个公开测试版本。\n- AI 语音转录与说话人分离\n- 文本驱动剪辑（选中文字=标记剪辑点）\n- SRT 字幕编辑与达芬奇同步\n- 音效管理与智能导入\n- 素材打包与时间线检查",
+  "downloads": {
+    "macos-aarch64": "https://quickclip-1340197331.cos.ap-guangzhou.myqcloud.com/releases/QuickClip-1.0.1-arm64.dmg",
+    "macos-x86_64": "",
+    "windows-x86_64": "",
+    "linux-x86_64": ""
+  }
+}

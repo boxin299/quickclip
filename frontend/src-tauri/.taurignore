@@ -1,0 +1,7 @@
+# Runtime data files — changes during normal operation trigger unwanted rebuilds
+src-tauri/backend-runtime/data/
+src-tauri/backend-runtime/lib/
+
+# SQLite WAL files (frequently modified during DB access)
+*.sqlite3-shm
+*.sqlite3-wal

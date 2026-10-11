@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickClip UI 改版确认 — 文本剪辑 & 字幕处理</title>
+<style>
+/* ===== CSS Variables (matching existing --mac-* dark theme) ===== */
+:root {
+  --mac-bg: #121212;
+  --mac-sidebar-bg: rgba(26, 26, 26, 0.6);
+  --mac-panel-bg: rgba(30, 30, 30, 0.4);
+  --mac-surface-solid: #1c1c1e;
+  --mac-surface-muted: #26262a;
+  --mac-content-bg: transparent;
+  --mac-border: rgba(255, 255, 255, 0.08);
+  --mac-border-highlight: rgba(255, 255, 255, 0.12);
+  --mac-text: #EDEDED;
+  --mac-text-secondary: #939393;
+  --mac-accent: #0A84FF;
+  --mac-accent-bg: rgba(10, 132, 255, 0.15);
+  --mac-input-bg: rgba(255, 255, 255, 0.04);
+  --mac-input-border: rgba(255, 255, 255, 0.08);
+  --mac-radius-lg: 16px;
+  --mac-radius-md: 10px;
+  --mac-radius-sm: 8px;
+  --mac-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --danger: #FF453A;
+  --warning: #FF9500;
+  --success: #34C759;
+  --purple: #AF52DE;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  background: var(--mac-bg);
+  color: var(--mac-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Top Tab Switcher ===== */
+.tab-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--mac-border);
+  background: var(--mac-surface-solid);
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+.tab-switcher button {
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.tab-switcher button:first-child { border-right: 1px solid var(--mac-border); }
+.tab-switcher button.active { background: var(--mac-accent); color: #fff; }
+.tab-switcher button:not(.active) { background: var(--mac-input-bg); color: var(--mac-text-secondary); }
+
+/* ===== Page Container ===== */
+.page { display: none; padding: 80px 24px 24px; max-width: 1200px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ===== Section Headers ===== */
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mac-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--mac-border);
+}
+
+/* ===== Cards ===== */
+.card {
+  background: var(--mac-surface-solid);
+  border-radius: var(--mac-radius-lg);
+  border: 1px solid var(--mac-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid var(--mac-border);
+  background: var(--mac-input-bg);
+  color: var(--mac-text-secondary);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { background: rgba(255,255,255,0.08); color: var(--mac-text); }
+.btn.primary { background: var(--mac-accent); color: #fff; border-color: transparent; }
+.btn.primary:hover { opacity: 0.9; }
+.btn.danger { color: var(--danger); }
+.btn.danger:hover { background: rgba(255,69,58,0.1); border-color: rgba(255,69,58,0.2); }
+.btn.ghost { background: transparent; border-color: transparent; }
+
+/* ===== Segmented Control ===== */
+.segmented {
+  display: flex;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--mac-border);
+}
+.segmented button {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 400;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--mac-input-bg);
+  color: var(--mac-text-secondary);
+}
+.segmented button + button { border-left: 1px solid var(--mac-border); }
+.segmented button.active { background: var(--mac-accent); color: #fff; font-weight: 600; }
+
+/* ===== Inputs ===== */
+.mac-input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--mac-border);
+  background: var(--mac-input-bg);
+  color: var(--mac-text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.mac-input:focus { border-color: var(--mac-accent); }
+
+/* ===== Tags / Chips ===== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--mac-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--mac-text-secondary);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tag.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: rgba(10, 132, 255, 0.3);
+  color: var(--mac-accent);
+  font-weight: 500;
+}
+
+/* ===== Tables ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mac-text-secondary);
+  letter-spacing: 0.04em;
+  padding: 10px 8px;
+  text-align: left;
+  background: var(--mac-surface-muted);
+}
+table th:first-child { padding-left: 20px; }
+table th:last-child { padding-right: 20px; }
+table td {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--mac-text-secondary);
+  border-bottom: 1px solid var(--mac-border);
+  font-variant-numeric: tabular-nums;
+}
+table td:first-child { padding-left: 20px; }
+table td:last-child { padding-right: 20px; }
+table tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+table tbody tr:hover { background: var(--mac-input-bg); }
+table td.center, table th.center { text-align: center; }
+
+/* Sticky header */
+.sticky-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid var(--mac-border);
+  background: var(--mac-surface-solid);
+}
+.sticky-table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--mac-surface-muted);
+}
+
+/* ===== Stat Cards Row ===== */
+.stat-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  flex: 1;
+  background: var(--mac-surface-solid);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--mac-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.stat-card .label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mac-text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.stat-card .value {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card .value.accent { color: var(--mac-accent); }
+.stat-card .value.success { color: var(--success); }
+.stat-card .value.sub { font-size: 12px; font-weight: 400; color: var(--mac-text-secondary); }
+
+/* ===== Alert / Banner ===== */
+.alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.alert.warning { background: rgba(255,149,0,0.06); border: 1px solid rgba(255,149,0,0.15); color: var(--mac-text-secondary); }
+.alert.error { background: rgba(255,59,48,0.1); color: #FF3B30; }
+.alert.success { background: rgba(52,199,89,0.1); color: #34C759; }
+.alert.info { background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.15); }
+
+/* ===== Speaker Tabs ===== */
+.speaker-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.speaker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid var(--mac-border);
+  background: transparent;
+  color: var(--mac-text-secondary);
+  transition: all 0.15s;
+}
+.speaker-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+/* ===== Separator bar for "纯文本" mode ===== */
+.text-flow-separator {
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background: var(--mac-accent);
+  border-radius: 3px;
+  margin: 0 6px;
+  opacity: 0.5;
+  vertical-align: middle;
+}
+
+/* ===== Annotations ===== */
+.annotation {
+  position: relative;
+}
+.annotation::after {
+  content: attr(data-note);
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--warning);
+  color: #000;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+.annotation-highlight {
+  outline: 2px dashed var(--warning);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ===== Changed indicator ===== */
+.changed {
+  box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.4);
+}
+
+/* ===== Project info bar (NEW - paths outside text clip) ===== */
+.project-info-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--mac-surface-muted);
+  border-radius: 10px;
+  border: 1px solid var(--mac-border);
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+.project-info-bar .info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mac-text-secondary);
+}
+.project-info-bar .info-item .info-label {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.project-info-bar .info-item .info-value {
+  color: var(--mac-text);
+  font-family: 'SF Mono', 'Geist Mono', monospace;
+  font-size: 11px;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Tooltip ===== */
+.tooltip {
+  position: relative;
+}
+.tooltip:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* ===== Legend ===== */
+.legend {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--mac-surface-solid);
+  border: 1px solid var(--mac-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 11px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-swatch { width: 16px; height: 4px; border-radius: 2px; }
+.legend-swatch.changed-swatch { background: var(--warning); height: 2px; outline: 2px dashed var(--warning); outline-offset: 2px; }
+.legend-swatch.new-swatch { background: var(--success); }
+</style>
+</head>
+<body>
+
+<!-- ===== Top Tab Switcher ===== -->
+<div class="tab-switcher">
+  <button id="tab-autoedit" class="active" onclick="switchTab('autoedit')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L6 22M18 2L18 22M2 6L22 6M2 18L22 18M2 2L22 22"/></svg>
+    文本剪辑 (AutoEditView)
+  </button>
+  <button id="tab-subtitle" onclick="switchTab('subtitle')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M12 12h6"/></svg>
+    字幕处理 (SubtitleEditorView)
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PAGE 1: 文本剪辑 (AutoEditView) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-autoedit" class="page active">
+
+  <!-- ━━━━ 1. 顶部：转录项目标签 + 路径信息栏 ━━━━ -->
+  <div class="section-title">转录项目</div>
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+
+    <!-- 项目标签行（无绑定切换 - 移动到管理界面） -->
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      <div class="tag active">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        访谈素材_v01
+        <span style="opacity:0.5;font-size:10px">(32段)</span>
+      </div>
+      <div class="tag">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        旁白配音
+        <span style="opacity:0.5;font-size:10px">(18段)</span>
+      </div>
+      <div class="tag">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        课程录制_03
+        <span style="opacity:0.5;font-size:10px">(45段)</span>
+      </div>
+      <!-- 管理按钮 -->
+      <button class="btn" style="padding:5px 10px;font-size:11px;" onclick="document.getElementById('page-autoedit').querySelector('.manage-panel').classList.toggle('hidden')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        管理
+      </button>
+      <button class="btn btn-ghost" style="padding:4px;opacity:0.5;" title="刷新">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+      </button>
+    </div>
+
+    <!-- ★ NEW: 项目路径信息栏 (移到文本剪辑外面) -->
+    <div class="project-info-bar changed" style="position:relative;">
+      <span style="position:absolute;top:-20px;left:12px;font-size:10px;color:var(--warning);font-weight:600;">
+        ★ 变更 1d: 路径信息移出，始终可见
+      </span>
+      <div class="info-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span class="info-label">导入路径:</span>
+        <span class="info-value">/Volumes/Media/Projects/DaVinci_Project_A/audio/clip_01.wav</span>
+      </div>
+      <div style="width:1px;height:20px;background:var(--mac-border);"></div>
+      <div class="info-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span class="info-label">媒体池路径:</span>
+        <span class="info-value">MediaPool/Timeline_Main/clip_01</span>
+      </div>
+    </div>
+
+    <!-- 管理面板 (默认隐藏) — 不含路径列 -->
+    <div class="card manage-panel hidden" style="padding:20px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <button class="btn" onclick="this.closest('.manage-panel').classList.add('hidden')" style="font-size:11px;">← 返回</button>
+        <span style="font-size:15px;font-weight:600;">转录项目管理</span>
+        <span style="font-size:11px;color:var(--mac-text-secondary);">共 3 个项目</span>
+        <span style="font-size:10px;color:var(--warning);margin-left:auto;">★ 变更 1a+1b: 绑定在此管理，路径列已移除</span>
+      </div>
+      <div style="border-radius:12px;overflow:hidden;border:1px solid var(--mac-border);">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--mac-sidebar-bg);border-bottom:1px solid var(--mac-border);font-size:11px;font-weight:600;color:var(--mac-text-secondary);">
+          <span style="flex:2">名称</span>
+          <span style="width:120px;text-align:center;">绑定</span>
+          <span style="width:60px;text-align:center;">操作</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;border-bottom:1px solid var(--mac-border);">
+          <span style="flex:2;color:var(--mac-text);">访谈素材_v01</span>
+          <span style="width:120px;text-align:center;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(175,82,222,0.08);color:#AF52DE;">项目A_2025</span>
+          </span>
+          <span style="width:60px;text-align:center;">
+            <button class="btn danger btn-ghost" style="padding:4px;">删除</button>
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;border-bottom:1px solid var(--mac-border);">
+          <span style="flex:2;color:var(--mac-text);">旁白配音</span>
+          <span style="width:120px;text-align:center;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(10,132,255,0.08);color:var(--mac-accent);">全局</span>
+          </span>
+          <span style="width:60px;text-align:center;">
+            <button class="btn danger btn-ghost" style="padding:4px;">删除</button>
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;">
+          <span style="flex:2;color:var(--mac-text);">课程录制_03</span>
+          <span style="width:120px;text-align:center;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(175,82,222,0.08);color:#AF52DE;">项目B_2025</span>
+          </span>
+          <span style="width:60px;text-align:center;">
+            <button class="btn danger btn-ghost" style="padding:4px;">删除</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━ 2. 统计卡片 ━━━━ -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="label">已选内容</div>
+      <div class="value accent">12 <span class="sub">个片段</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">选取时长</div>
+      <div class="value success">05:32.400</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">当前可见</div>
+      <div class="value" style="color:var(--mac-text);">28 <span class="sub">/ 32 段</span></div>
+    </div>
+  </div>
+
+  <!-- ━━━━ 3. 说话人过滤 + 视图切换工具栏 ━━━━ -->
+  <div class="card" style="padding:12px 16px;margin-bottom:16px;">
+    <!-- 说话人过滤 -->
+    <div class="speaker-tabs" style="margin-bottom:10px;">
+      <div class="speaker-chip" style="border-color:rgba(10,132,255,0.3);background:rgba(10,132,255,0.12);color:var(--mac-accent);">
+        <span class="dot" style="background:var(--mac-accent);"></span> 张三 <span style="opacity:0.7">18</span>
+      </div>
+      <div class="speaker-chip" style="border-color:rgba(255,149,0,0.3);background:rgba(255,149,0,0.12);color:#FF9500;">
+        <span class="dot" style="background:#FF9500;"></span> 李四 <span style="opacity:0.7">10</span>
+      </div>
+      <div class="speaker-chip" style="border-color:rgba(52,199,89,0.3);background:rgba(52,199,89,0.12);color:#34C759;">
+        <span class="dot" style="background:#34C759;"></span> 王五 <span style="opacity:0.7">4</span>
+      </div>
+      <button class="btn" style="padding:4px 10px;font-size:11px;border-radius:999px;">选择当前可见</button>
+      <button class="btn" style="padding:4px 10px;font-size:11px;border-radius:999px;">隐藏全部</button>
+      <button class="btn" style="padding:4px 10px;font-size:11px;border-radius:999px;">清空选择</button>
+      <button class="btn" style="padding:4px 10px;font-size:11px;border-radius:999px;">展开全部</button>
+      <span style="font-size:11px;color:var(--mac-accent);margin-left:8px;">已选取 12 段 · 05:32.400</span>
+    </div>
+
+    <!-- 视图切换 + 时间格式 + 显示/隐藏操作 -->
+    <div style="display:flex;align-items:center;gap:8px;border-top:1px solid var(--mac-border);padding-top:10px;">
+      <div class="segmented">
+        <button class="active" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          区块视图
+        </button>
+        <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/></svg>
+          表视图
+        </button>
+      </div>
+
+      <!-- ★ NEW: 时间格式切换（文本剪辑也支持了） -->
+      <span style="font-size:10px;color:var(--mac-text-secondary);margin-left:8px;">时间格式:</span>
+      <div class="segmented changed" style="position:relative;">
+        <span style="position:absolute;top:-18px;left:0;font-size:9px;color:var(--warning);white-space:nowrap;">★ 变更 3c</span>
+        <button class="active">HH:MM:SS:FF</button>
+        <button>MM:SS.ms</button>
+      </div>
+
+      <div style="flex:1;"></div>
+      <button class="btn" style="padding:5px 10px;font-size:11px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        隐藏操作
+      </button>
+    </div>
+  </div>
+
+  <!-- ━━━━ 4. 内容区域: 区块视图 ━━━━ -->
+  <div class="card" style="padding:16px;margin-bottom:16px;">
+    <!-- 区块视图内容模拟 -->
+    <div style="border:1px solid var(--mac-border);border-radius:12px;padding:14px;margin-bottom:14px;background:rgba(255,255,255,0.02);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:11px;background:rgba(10,132,255,0.12);color:var(--mac-accent);border:1px solid rgba(10,132,255,0.2);">
+          <span style="width:6px;height:6px;border-radius:999px;background:var(--mac-accent);"></span> 张三
+        </span>
+        <span style="font-size:11px;color:var(--mac-text-secondary);font-family:monospace;">00:00.000 - 02:15.300</span>
+        <span style="font-size:11px;color:var(--mac-text-secondary);">8 段</span>
+        <button class="btn" style="padding:4px 10px;font-size:10px;border-radius:999px;">选择本块</button>
+        <button class="btn" style="padding:4px 10px;font-size:10px;border-radius:999px;">清空本块</button>
+      </div>
+
+      <!-- 区块视图 — 显示操作模式（逐句分行 + 整句按钮） -->
+      <div style="font-size:15px;line-height:2;color:var(--mac-text);word-break:break-word;">
+        <p style="margin-bottom:8px;">
+          <span style="color:var(--mac-text-secondary);">大家好，欢迎收看今天的节目。</span>
+          <button class="btn" style="margin-left:6px;padding:2px 8px;font-size:10px;border-radius:999px;">整句</button>
+        </p>
+        <p style="margin-bottom:8px;">
+          <span style="color:var(--mac-text-secondary);">今天我们要讨论的话题非常有意思。</span>
+          <button class="btn" style="margin-left:6px;padding:2px 8px;font-size:10px;border-radius:999px;">整句</button>
+        </p>
+        <p style="margin-bottom:0;">
+          <span style="color:var(--mac-text-secondary);">让我们开始吧。</span>
+          <button class="btn" style="margin-left:6px;padding:2px 8px;font-size:10px;border-radius:999px;">整句</button>
+        </p>
+      </div>
+    </div>
+
+    <!-- 第二个说话人区块 -->
+    <div style="border:1px solid var(--mac-border);border-radius:12px;padding:14px;margin-bottom:14px;background:rgba(255,255,255,0.02);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:11px;background:rgba(255,149,0,0.12);color:#FF9500;border:1px solid rgba(255,149,0,0.2);">
+          <span style="width:6px;height:6px;border-radius:999px;background:#FF9500;"></span> 李四
+        </span>
+        <span style="font-size:11px;color:var(--mac-text-secondary);font-family:monospace;">02:15.300 - 05:32.400</span>
+        <span style="font-size:11px;color:var(--mac-text-secondary);">4 段</span>
+        <button class="btn" style="padding:4px 10px;font-size:10px;border-radius:999px;">选择本块</button>
+        <button class="btn" style="padding:4px 10px;font-size:10px;border-radius:999px;">清空本块</button>
+      </div>
+
+      <!-- ★ NEW 变更 3b: 隐藏操作时纯文本连续显示，加分隔符 -->
+      <div style="font-size:15px;line-height:2;color:var(--mac-text);word-break:break-word;position:relative;">
+        <div style="position:absolute;top:-22px;left:0;font-size:10px;color:var(--warning);font-weight:600;">★ 变更 3b: 隐藏操作 → 纯文本连续显示</div>
+        <span style="color:var(--mac-text-secondary);">是的，我也觉得这个话题很有深度。</span>
+        <span class="text-flow-separator"></span>
+        <span style="color:var(--mac-text-secondary);">特别是当我们考虑到实际应用的场景时，会发现很多有趣的切入点。</span>
+        <span class="text-flow-separator"></span>
+        <span style="color:var(--mac-text-secondary);">比如说在教育领域，这个技术的应用前景非常广阔。</span>
+        <span class="text-flow-separator"></span>
+        <span style="color:var(--mac-text-secondary);">当然我们也需要考虑成本和可行性的问题。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━ 5. 底部操作栏 ━━━━ -->
+  <div style="margin-top:16px;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn primary" style="flex:1;padding:10px 12px;justify-content:center;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L6 22M18 2L18 22M2 6L22 6M2 18L22 18M2 2L22 22"/></svg>
+        创建新时间线
+      </button>
+      <button class="btn" style="flex:1;padding:10px 12px;justify-content:center;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        追加到末尾
+      </button>
+    </div>
+    <div class="alert warning">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      新时间线中的片段将从源素材重新插入，原始片段的缩放、调色、特效等属性不会被保留。
+    </div>
+    <button class="btn primary" style="width:100%;height:40px;font-size:14px;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L6 22M18 2L18 22M2 6L22 6M2 18L22 18M2 2L22 22"/></svg>
+      应用修改 (12 段, 05:32.400)
+    </button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PAGE 2: 字幕处理 (SubtitleEditorView) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="page-subtitle" class="page">
+
+  <!-- ━━━━ 1. 顶部：转录项目与绑定（与文本剪辑同步） ━━━━ -->
+  <div class="section-title" style="position:relative;">
+    按转录项目
+    <span style="position:absolute;right:0;font-size:10px;color:var(--warning);">★ 变更 2a: 与文本剪辑保持同步</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+    <div class="tag active">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      访谈素材_v01 (32段)
+    </div>
+    <div class="tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      旁白配音 (18段)
+    </div>
+    <button class="btn" style="padding:5px 10px;font-size:11px;">管理</button>
+  </div>
+
+  <!-- ━━━━ 2. ★ NEW: 绑定音频轨道 (从变速匹配面板移出) ━━━━ -->
+  <div class="card changed" style="padding:14px 18px;margin-bottom:16px;position:relative;">
+    <span style="position:absolute;top:-20px;left:12px;font-size:10px;color:var(--warning);font-weight:600;">★ 变更 2c: 绑定音频轨道移出到项目级别</span>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mac-accent)" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span style="font-size:12px;font-weight:500;color:var(--mac-text);">绑定音频轨道</span>
+      <div style="position:relative;">
+        <button class="btn" style="padding:5px 12px;font-size:11px;min-width:120px;justify-content:space-between;">
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="width:20px;height:20px;border-radius:6px;background:rgba(10,132,255,0.2);color:#0A84FF;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">A1</span>
+            音频轨道 1 · 24 个片段
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <button class="btn" style="padding:6px 12px;font-size:11px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+        刷新轨道
+      </button>
+      <span style="font-size:11px;color:var(--mac-text-secondary);margin-left:auto;">绑定到当前项目，供变速匹配和字幕处理共用</span>
+    </div>
+  </div>
+
+  <!-- ━━━━ 3. ★ 美化后的工具栏 ━━━━ -->
+  <div class="card changed" style="padding:10px 18px;margin-bottom:16px;position:relative;">
+    <span style="position:absolute;top:-20px;left:12px;font-size:10px;color:var(--warning);font-weight:600;">★ 变更 2b: 按键美化</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <button class="btn primary" style="padding:8px 16px;font-size:12px;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        从达芬奇拉取
+      </button>
+      <button class="btn" style="padding:8px 16px;font-size:12px;gap:6px;background:rgba(255,255,255,0.06);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导入本地字幕
+      </button>
+      <button class="btn" style="padding:8px 16px;font-size:12px;gap:6px;background:rgba(255,255,255,0.06);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        查找替换
+      </button>
+      <button class="btn" style="padding:8px 16px;font-size:12px;gap:6px;background:rgba(255,255,255,0.06);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        下载 SRT
+      </button>
+      <span style="width:1px;height:24px;background:var(--mac-border);"></span>
+      <button class="btn" style="padding:8px 16px;font-size:12px;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        同步时间线
+      </button>
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mac-text-secondary);">
+        最小间隔
+        <input type="range" style="width:60px;accent-color:var(--mac-accent);" min="0" max="5" step="0.1" value="1.0">
+        <span style="font-variant-numeric:tabular-nums;">1.0s</span>
+      </span>
+      <span style="width:1px;height:24px;background:var(--mac-border);"></span>
+      <button class="btn primary" style="padding:8px 20px;font-size:12px;gap:6px;background:var(--purple);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        插入字幕
+      </button>
+    </div>
+  </div>
+
+  <!-- ━━━━ 4. 变速匹配面板（简化，不含绑定音频轨道） ━━━━ -->
+  <div class="card" style="padding:14px 18px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span style="font-size:13px;font-weight:500;">字幕变速匹配</span>
+      <span style="font-size:11px;color:var(--mac-text-secondary);">跟随音视频波形微调字幕时码</span>
+      <!-- 开关 -->
+      <div style="margin-left:auto;width:44px;height:24px;border-radius:12px;background:var(--mac-border);position:relative;cursor:pointer;">
+        <div style="width:20px;height:20px;border-radius:10px;background:#FFF;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mac-text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <!-- 展开内容示例 (不含轨道选择 - 已移到外面) -->
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--mac-border);">
+      <div style="font-size:11px;color:var(--mac-text-secondary);display:flex;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        常用词汇匹配表 <span style="opacity:0.6;">切割时优先贴近这些词的边界</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <span style="padding:4px 10px;background:rgba(255,149,0,0.12);border-radius:6px;font-size:11px;color:#FF9500;">因为</span>
+        <span style="padding:4px 10px;background:rgba(255,149,0,0.12);border-radius:6px;font-size:11px;color:#FF9500;">所以</span>
+        <span style="padding:4px 10px;background:rgba(255,149,0,0.12);border-radius:6px;font-size:11px;color:#FF9500;">但是</span>
+        <span style="padding:4px 10px;background:rgba(10,132,255,0.12);border-radius:6px;font-size:11px;color:#0A84FF;">because</span>
+        <span style="padding:4px 10px;background:rgba(10,132,255,0.12);border-radius:6px;font-size:11px;color:#0A84FF;">want to</span>
+        <button class="btn" style="padding:4px 12px;font-size:11px;">管理常用词汇</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━ 5. 时间格式切换 ━━━━ -->
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:6px;">
+    <span style="font-size:10px;color:var(--mac-text-secondary);">时间格式:</span>
+    <div class="segmented">
+      <button class="active">HH:MM:SS:FF</button>
+      <button>MM:SS.ms</button>
+    </div>
+  </div>
+
+  <!-- ━━━━ 6. ★ 字幕表格 - 固定表头 ━━━━ -->
+  <div class="sticky-table-wrapper changed" style="position:relative;">
+    <span style="position:absolute;top:-22px;left:12px;font-size:10px;color:var(--warning);font-weight:600;z-index:50;">★ 变更 2d: 固定表头</span>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px;text-align:center;">#</th>
+          <th style="width:120px;">开始时间</th>
+          <th style="width:120px;">结束时间</th>
+          <th>字幕文本 <span style="font-weight:400;opacity:0.5;">(Enter 拆分 · Backspace 合并)</span></th>
+          <th style="width:100px;text-align:center;">操作</th>
+          <th style="width:42px;text-align:center;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align:center;">1</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:00:00</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:02:15</span></td>
+          <td><input class="mac-input" value="大家好，欢迎收看今天的节目。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;" title="定位时间线">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;" title="向上合并">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">2</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:02:15</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:05:08</span></td>
+          <td><input class="mac-input" value="今天我们要讨论的话题非常有意思。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">3</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:06:00</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:09:12</span></td>
+          <td><input class="mac-input" value="特别是当我们考虑到实际应用的场景时。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">4</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:10:00</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:13:23</span></td>
+          <td><input class="mac-input" value="我们可以找到很多有趣的切入点。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">5</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:14:00</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:17:10</span></td>
+          <td><input class="mac-input" value="比如说在教育领域，应用前景很广。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">6</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:18:00</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:22:05</span></td>
+          <td><input class="mac-input" value="当然我们也需要考虑成本和可行性。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">7</td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:22:06</span></td>
+          <td><span style="display:block;padding:6px 8px;text-align:center;border-radius:6px;font-family:'SF Mono',monospace;background:var(--mac-input-bg);">00:00:25:18</span></td>
+          <td><input class="mac-input" value="让我们来深入探讨一下这个话题。" style="width:100%;font-size:14px;padding:8px 12px;border-radius:8px;"></td>
+          <td style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">📍</button>
+              <button class="btn" style="width:32px;height:32px;padding:0;justify-content:center;">↑</button>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <button class="btn danger" style="width:32px;height:32px;padding:0;justify-content:center;">✕</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="padding:8px 4px 0;font-size:10px;color:var(--mac-text-secondary);opacity:0.6;text-align:right;">
+    Enter = 智能拆分 &nbsp;|&nbsp; 光标在行首按 Backspace = 向上合并
+  </div>
+
+</div>
+
+<!-- ===== Legend ===== -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatch changed-swatch"></div>
+    <span>橙色虚线框 = 改版变更点</span>
+  </div>
+  <div class="legend-item">
+    <span style="color:var(--warning);font-weight:600;">★ 变更 Nx</span>
+    <span>= 对应需求描述中的编号</span>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// Add hidden class support
+const style = document.createElement('style');
+style.textContent = '.hidden { display: none !important; }';
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>

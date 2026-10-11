@@ -1,0 +1,222 @@
+/**
+ * 转录编辑器样式
+ */
+
+.transcript-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.editor-header .stats {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.editor-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    gap: 20px;
+    min-height: 0;
+}
+
+.segments-list,
+.deleted-segments {
+    flex: 1;
+    min-width: 0;
+}
+
+.segments-list h3,
+.deleted-segments h3 {
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    color: var(--text-primary);
+}
+
+.hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+}
+
+/* ── 说话人管理面板 ── */
+.speaker-panel {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.speaker-panel select.mac-input,
+.segment-speaker-select {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--mac-border);
+    background: var(--mac-input-bg);
+    color: var(--mac-text);
+}
+
+/* ── 段落项 ── */
+.segment-item {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s;
+}
+
+.segment-item:hover {
+    border-color: var(--accent-primary);
+}
+
+.segment-item.bold {
+    border-color: var(--accent-primary);
+    background-color: rgba(14, 99, 156, 0.08);
+}
+
+.segment-item.deleted {
+    opacity: 0.45;
+    background-color: transparent;
+}
+
+/* ── 段落头部 ── */
+.segment-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.segment-speaker-select {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--mac-border);
+    background: var(--mac-input-bg);
+    color: var(--mac-text);
+    font-weight: 500;
+}
+
+.segment-time {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* ── 段落文本 ── */
+.segment-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    padding: 4px 0;
+}
+
+.segment-words {
+    display: inline;
+    line-height: 2;
+}
+
+.segment-word {
+    display: inline;
+    margin: 0 1px;
+    user-select: none;
+}
+
+.segment-word:hover {
+    background: rgba(10, 132, 255, 0.15) !important;
+    border-radius: 3px;
+}
+
+.segment-word.selected {
+    background: var(--mac-accent) !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
+
+/* ── 编辑输入 ── */
+.segment-edit-input {
+    width: 100%;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 2px solid var(--mac-accent);
+    background: var(--mac-input-bg);
+    color: var(--mac-text);
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* ── 操作按钮 ── */
+.segment-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.segment-actions button.small {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--mac-border);
+    background: var(--mac-input-bg);
+    color: var(--mac-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.segment-actions button.small:hover {
+    background: var(--mac-accent);
+    color: #fff;
+    border-color: transparent;
+}
+
+.segment-actions button.small.active {
+    background: var(--mac-accent);
+    color: #fff;
+    border-color: transparent;
+}
+
+.segment-actions button.small.danger:hover {
+    background: #FF3B30;
+    color: #fff;
+    border-color: transparent;
+}
+
+/* ── 已删除段落 ── */
+.deleted-segments {
+    max-width: 380px;
+    flex-shrink: 0;
+}
+
+.deleted-segments h3 {
+    color: var(--error-color);
+}

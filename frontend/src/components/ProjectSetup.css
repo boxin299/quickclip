@@ -1,0 +1,116 @@
+.project-setup {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+}
+
+.mac-panel {
+    background: var(--mac-panel-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--mac-border);
+}
+
+.project-setup h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--mac-text-secondary);
+    font-size: 13px;
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mac-text);
+}
+
+.mac-input {
+    background: var(--mac-input-bg);
+    border: 1px solid var(--mac-input-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--mac-text);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.mac-input:focus {
+    border-color: var(--mac-accent);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.input-group .mac-input {
+    flex: 1;
+}
+
+.mac-button {
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mac-button.primary {
+    background: var(--mac-accent);
+    color: white;
+}
+
+.mac-button.primary:hover {
+    background: #006ee6;
+}
+
+.mac-button.primary:disabled {
+    background: var(--mac-disabled);
+    color: var(--mac-text-secondary);
+    cursor: not-allowed;
+}
+
+.mac-button.secondary {
+    background: var(--mac-button-secondary-bg);
+    color: var(--mac-text);
+    border: 1px solid var(--mac-border);
+}
+
+.mac-button.secondary:hover {
+    background: var(--mac-button-secondary-hover);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.mac-error {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+}
